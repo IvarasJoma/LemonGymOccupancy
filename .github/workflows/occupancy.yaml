@@ -1,0 +1,39 @@
+name: Gym Occupancy Logger
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  log-occupancy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run occupancy logger
+        run: python logger/main.py
+
+      - name: Commit CSVs daily
+        run: |
+          TODAY=$(date +'%Y-%m-%d')
+          LAST_COMMIT_DATE=$(git log -1 --format=%cd --date=format:'%Y-%m-%d' clubs_data)
+          if [ "$TODAY" != "$LAST_COMMIT_DATE" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add clubs_data/*.csv
+            git commit -m "Update occupancy CSVs for $TODAY [skip ci]"
+            git push
+          else
+            echo "✅ Already committed today ($TODAY), skipping commit."

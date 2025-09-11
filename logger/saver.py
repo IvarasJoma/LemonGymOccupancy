@@ -4,11 +4,13 @@ from datetime import datetime
 from config import DATA_FOLDER, FILENAME_REPLACE_CHAR
 
 def save_club_data(club_data):
-    os.makedirs(DATA_FOLDER, exist_ok=True)
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    folder_path = os.path.join(repo_root, DATA_FOLDER)
+    os.makedirs(folder_path, exist_ok=True)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     for club in club_data:
         safe_name = "".join(c if c.isalnum() else FILENAME_REPLACE_CHAR for c in club["club_name"])
-        filepath = os.path.join(DATA_FOLDER, f"{safe_name}.csv")
+        filepath = os.path.join(folder_path, f"{safe_name}.csv")
         file_exists = os.path.isfile(filepath)
         with open(filepath, "a", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=["timestamp", "club", "address", "occupancy"])
