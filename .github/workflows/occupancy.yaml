@@ -27,9 +27,15 @@ jobs:
         run: python logger/main.py
 
       - name: Commit CSVs daily
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Authenticate Git with the token
+          git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git
+
           TODAY=$(date +'%Y-%m-%d')
-          LAST_COMMIT_DATE=$(git log -1 --format=%cd --date=format:'%Y-%m-%d' clubs_data)
+          LAST_COMMIT_DATE=$(git log -1 --format=%cd --date=format:'%Y-%m-%d' clubs_data || echo "")
+
           if [ "$TODAY" != "$LAST_COMMIT_DATE" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
