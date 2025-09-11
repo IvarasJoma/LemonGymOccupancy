@@ -2,47 +2,39 @@ name: Gym Occupancy Logger
 
 on:
   schedule:
-    - cron: "*/30 * * * *"  # Runs every 30 minutes
-  workflow_dispatch:        # Allows manual trigger
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 jobs:
   log-occupancy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout the repo without persisting credentials
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           persist-credentials: false
 
-      # 2️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 4️⃣ Run your logger script
       - name: Run occupancy logger
         run: python logger/main.py
 
-      # 5️⃣ Commit CSVs daily
       - name: Commit CSVs daily
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Authenticate git using the token
           git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git
-
           TODAY=$(date +'%Y-%m-%d')
           LAST_COMMIT_DATE=$(git log -1 --format=%cd --date=format:'%Y-%m-%d' clubs_data || echo "")
-
           if [ "$TODAY" != "$LAST_COMMIT_DATE" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
