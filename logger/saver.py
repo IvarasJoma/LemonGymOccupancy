@@ -2,13 +2,18 @@ import os
 import csv
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from config import DATA_FOLDER, FILENAME_REPLACE_CHAR
+from config import DATA_FOLDER, FILENAME_REPLACE_CHAR, START_HOUR, END_HOUR
 
 def save_club_data(club_data):
+    now = datetime.now(ZoneInfo("Europe/Vilnius"))
+    current_hour = now.hour
+    if not (START_HOUR <= current_hour <= END_HOUR):
+        print(f"💤 Skipping logging at {now.strftime('%H:%M:%S')} (outside active hours)")
+        return
+    timestamp = datetime.now(ZoneInfo("Europe/Vilnius")).strftime("%Y-%m-%d %H:%M:%S")
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     folder_path = os.path.join(repo_root, DATA_FOLDER)
     os.makedirs(folder_path, exist_ok=True)
-    timestamp = datetime.now(ZoneInfo("Europe/Vilnius")).strftime("%Y-%m-%d %H:%M:%S")
     for club in club_data:
         safe_name = "".join(c if c.isalnum() else FILENAME_REPLACE_CHAR for c in club["club_name"])
         filepath = os.path.join(folder_path, f"{safe_name}.csv")
