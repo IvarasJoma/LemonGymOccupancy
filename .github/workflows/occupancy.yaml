@@ -8,6 +8,7 @@ on:
 jobs:
   log-occupancy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -37,3 +38,4 @@ jobs:
             git push
           else
             echo "✅ Already committed today ($TODAY), skipping commit."
+          fi
