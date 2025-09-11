@@ -11,8 +11,6 @@ def save_club_data(club_data):
     folder_path = os.path.join(repo_root, DATA_FOLDER)
     os.makedirs(folder_path, exist_ok=True)
     for club in club_data:
-        if club["occupancy"] == 0:
-            continue
         safe_name = "".join(c if c.isalnum() else FILENAME_REPLACE_CHAR for c in club["club_name"])
         filepath = os.path.join(folder_path, f"{safe_name}.csv")
         file_exists = os.path.isfile(filepath)
