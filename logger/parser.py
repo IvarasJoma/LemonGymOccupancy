@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 def parse_clubs(html_content):
-    soup = BeautifulSoup(html_content, "html.parser")
+    soup = BeautifulSoup(html_content, "lxml")
     clubs = []
     for block in soup.select(".clubs-occupancy"):
         club_name = block.select_one("h6").get_text(strip=True)
